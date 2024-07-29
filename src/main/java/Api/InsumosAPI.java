@@ -90,11 +90,23 @@ public class InsumosAPI {
 
 
     @PUT
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateConcepto(@FormParam("id") int id,
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) //Esto es para recibir los datos de esta manera = application/x-www-form-urlencoded
+
+    public Response updateConcepto(@PathParam("id") int id,
                                    @FormParam("nombre") String nombre,
                                    @FormParam("descripcion") String descripcion,
-                                   @FormParam("precio") double precio) throws SQLException {
+                                   @FormParam("precio") Double precio) throws SQLException {
+
+        // Verificaciones nulas
+        if (nombre == null || descripcion == null || precio == 0) {
+            System.out.println("-------------------ERROR DE NULOS RECIBIDOS -----------------------");
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Todos los campos (nombre, descripcion, precio) son obligatorios")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
+        }
 
         // Validaciones
         nombre = nombre.trim();
@@ -103,18 +115,21 @@ public class InsumosAPI {
         if (precio <= 0.0) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("El precio debe ser mayor a 0.0")
+                    .header("Access-Control-Allow-Origin", "*")
                     .build();
         }
 
         if (nombre.length() <= 2) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("El nombre debe tener más de 2 caracteres")
+                    .header("Access-Control-Allow-Origin", "*")
                     .build();
         }
 
         if (descripcion.length() <= 2) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("La descripción debe tener más de 2 caracteres")
+                    .header("Access-Control-Allow-Origin", "*")
                     .build();
         }
 
@@ -141,9 +156,11 @@ public class InsumosAPI {
                 .build();
     }
 
+
     @DELETE
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteConcepto(@FormParam("id") int id) throws SQLException {
+    public Response deleteConcepto(@PathParam("id") int id) throws SQLException {
         InsumosDAO fuenteDeDatos = new InsumosDAO();
 
         // Uso del DAO para la eliminación
@@ -160,7 +177,6 @@ public class InsumosAPI {
                 .entity("Hubo un error en eliminar el Insumo")
                 .build();
     }
-
 
 
 }
